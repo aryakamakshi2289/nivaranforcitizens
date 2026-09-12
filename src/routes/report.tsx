@@ -35,7 +35,7 @@ function ReportPage() {
   const { submitComplaint } = useNivaran();
   const [category, setCategory] = useState<string>(CATEGORIES[0]);
   const [description, setDescription] = useState("");
-  const [location, setLocation] = useState(SAMPLE_LOCATIONS[0]);
+  const [location, setLocation] = useState(SAMPLE_LOCATIONS[0] ?? "");
   const [image, setImage] = useState<string | null>(null);
   const [fileName, setFileName] = useState("");
   const [submittedId, setSubmittedId] = useState<string | null>(null);
