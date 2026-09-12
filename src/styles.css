@@ -5,8 +5,9 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Nivaran design system.
- * Blue-dominant civic-tech palette. All colours are oklch tokens.
+ * Nivaran design system — dark blue civic-tech.
+ * Deep navy foundation, slate/sky blue for depth and interaction,
+ * off-white used sparingly inside contained elements only.
  */
 
 @theme inline {
@@ -37,6 +38,11 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-soft: var(--soft);
   --color-soft-foreground: var(--soft-foreground);
+  --color-field: var(--field);
+  --color-ink: var(--ink);
+  --color-navy: var(--navy);
+  --color-navy-deep: var(--navy-deep);
+  --color-slate-blue: var(--slate-blue);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
@@ -46,42 +52,57 @@
   --color-awaiting: var(--awaiting);
   --color-challenged: var(--challenged);
 
-  --shadow-card: 0 1px 2px oklch(0.2785 0.0564 249.75 / 0.06), 0 8px 24px -12px oklch(0.2785 0.0564 249.75 / 0.14);
-  --shadow-raised: 0 2px 4px oklch(0.2785 0.0564 249.75 / 0.06), 0 18px 40px -20px oklch(0.2785 0.0564 249.75 / 0.22);
+  --shadow-card: 0 1px 0 rgb(246 243 238 / 0.04) inset, 0 18px 40px -24px rgb(4 12 22 / 0.8);
+  --shadow-raised: 0 1px 0 rgb(246 243 238 / 0.06) inset, 0 28px 60px -28px rgb(4 12 22 / 0.9);
 }
 
 :root {
   --radius: 0.875rem;
 
-  --background: oklch(0.9807 0.0051 247.88);
-  --foreground: oklch(0.2796 0.0381 242.27);
-  --card: oklch(0.9936 0.0017 247.84);
-  --card-foreground: oklch(0.2796 0.0381 242.27);
-  --popover: oklch(0.9936 0.0017 247.84);
-  --popover-foreground: oklch(0.2796 0.0381 242.27);
+  /* Dark blue foundation */
+  --background: #0b1f33;
+  --foreground: #eef4f9;
+  --navy: #102a43;
+  --navy-deep: #0b1f33;
+  --slate-blue: #274c77;
 
-  --primary: oklch(0.2785 0.0564 249.75);
-  --primary-foreground: oklch(0.9936 0.0017 247.84);
-  --secondary: oklch(0.4108 0.0842 253.55);
-  --secondary-foreground: oklch(0.9936 0.0017 247.84);
-  --accent: oklch(0.5846 0.107 243.32);
-  --accent-foreground: oklch(0.9936 0.0017 247.84);
-  --soft: oklch(0.9569 0.0118 239.91);
-  --soft-foreground: oklch(0.2785 0.0564 249.75);
+  --card: #102a43;
+  --card-foreground: #eef4f9;
+  --popover: #102a43;
+  --popover-foreground: #eef4f9;
 
-  --muted: oklch(0.9569 0.0118 239.91);
-  --muted-foreground: oklch(0.4108 0.0842 253.55 / 0.72);
+  /* primary = the off-white used for headings, key text and light CTAs */
+  --primary: #f6f3ee;
+  --primary-foreground: #0b1f33;
 
-  --destructive: oklch(0.6096 0.1395 22.07);
-  --destructive-foreground: oklch(0.9936 0.0017 247.84);
+  /* secondary = readable light blue-slate body text on dark */
+  --secondary: #b7ccdf;
+  --secondary-foreground: #0b1f33;
 
-  --border: oklch(0.2785 0.0564 249.75 / 0.1);
-  --input: oklch(0.2785 0.0564 249.75 / 0.16);
-  --ring: oklch(0.5846 0.107 243.32);
+  --accent: #4b95c9;
+  --accent-foreground: #071726;
 
-  --verified: oklch(0.5897 0.097 161.75);
-  --awaiting: oklch(0.743 0.132 81.07);
-  --challenged: oklch(0.6096 0.1395 22.07);
+  /* soft = subtle raised blue surface for pills, tiles and UI states */
+  --soft: #17395a;
+  --soft-foreground: #eaf2f8;
+
+  --muted: #17395a;
+  --muted-foreground: #93aec6;
+
+  /* contained light elements: inputs, evidence boxes, complaint bubbles */
+  --field: #f6f3ee;
+  --ink: #102a43;
+
+  --destructive: #d47a7a;
+  --destructive-foreground: #0b1f33;
+
+  --border: rgb(159 194 224 / 0.16);
+  --input: rgb(159 194 224 / 0.26);
+  --ring: #4b95c9;
+
+  --verified: #62b98f;
+  --awaiting: #e3b45f;
+  --challenged: #dd8383;
 }
 
 @layer base {
@@ -91,6 +112,7 @@
 
   html {
     -webkit-font-smoothing: antialiased;
+    scroll-behavior: smooth;
   }
 
   body {
@@ -105,13 +127,39 @@
     font-family: var(--font-display);
     letter-spacing: -0.02em;
   }
+
+  ::selection {
+    background: var(--color-accent);
+    color: var(--color-accent-foreground);
+  }
 }
 
+/* ---------- surfaces ---------- */
+
 @utility card-surface {
+  position: relative;
   background-color: var(--color-card);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   box-shadow: var(--shadow-card);
+  transition:
+    border-color 400ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 400ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@utility card-lift {
+  &:hover {
+    border-color: rgb(75 149 201 / 0.45);
+    box-shadow: var(--shadow-raised);
+    transform: translateY(-2px);
+  }
+}
+
+@utility panel-deep {
+  background-color: var(--color-navy-deep);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
 }
 
 @utility label-caps {
@@ -120,4 +168,115 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-muted-foreground);
+}
+
+/* ---------- motion ---------- */
+
+@keyframes niv-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes niv-drift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(0, -18px, 0) scale(1.04);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes niv-dash {
+  to {
+    stroke-dashoffset: -240;
+  }
+}
+
+@keyframes niv-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes niv-pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 currentcolor;
+    opacity: 0.6;
+  }
+  70% {
+    box-shadow: 0 0 0 9px transparent;
+    opacity: 0;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+    opacity: 0;
+  }
+}
+
+@keyframes niv-grow {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@utility reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+@utility reveal-in {
+  opacity: 1;
+  transform: none;
+}
+
+@utility animate-drift {
+  animation: niv-drift 18s ease-in-out infinite;
+}
+
+@utility flow-dash {
+  stroke-dasharray: 6 14;
+  animation: niv-dash 9s linear infinite;
+}
+
+@utility timeline-grow {
+  transform-origin: top;
+  animation: niv-grow 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--tl-delay, 0ms);
+}
+
+@utility timeline-dot {
+  animation: niv-rise 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--tl-delay, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
 }
