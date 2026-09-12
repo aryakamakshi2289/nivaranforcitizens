@@ -52,3 +52,33 @@ export function Reveal({
     </As>
   );
 }
+
+/** Observer hook for components that need to reveal themselves in place. */
+export function useReveal<T extends HTMLElement>() {
+  const ref = useRef<T | null>(null);
+  const [shown, setShown] = useState(false);
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setShown(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setShown(true);
+            observer.disconnect();
+          }
+        }
+      },
+      { rootMargin: "0px 0px -6% 0px", threshold: 0.05 },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  return { ref, shown };
+}
