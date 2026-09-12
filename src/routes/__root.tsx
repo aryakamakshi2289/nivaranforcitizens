@@ -132,7 +132,9 @@ function RootComponent() {
           <SiteHeader />
           <main className="flex-1">
             {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-            <Outlet />
+            <PageTransition>
+              <Outlet />
+            </PageTransition>
           </main>
           <SiteFooter />
         </div>
