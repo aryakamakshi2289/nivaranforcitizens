@@ -24,7 +24,7 @@ export const Route = createFileRoute("/report")({
   component: ReportPage,
 });
 
-const SAMPLE_LOCATIONS = [
+const SAMPLE_LOCATIONS: string[] = [
   "Sector 15 Road, near the bus stop",
   "Park Avenue, Block 4",
   "Market Street, Gate 2",
