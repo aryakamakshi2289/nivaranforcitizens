@@ -1,9 +1,15 @@
 import type { ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
+import { useReveal } from "@/components/Reveal";
 
 export function Card({ className, children }: { className?: string; children: ReactNode }) {
-  return <div className={cn("card-surface card-lift", className)}>{children}</div>;
+  const { ref, shown } = useReveal<HTMLDivElement>();
+  return (
+    <div ref={ref} className={cn("card-surface card-lift reveal", shown && "reveal-in", className)}>
+      {children}
+    </div>
+  );
 }
 
 export function SectionLabel({ children, className }: { children: ReactNode; className?: string }) {
