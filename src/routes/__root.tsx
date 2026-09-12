@@ -122,6 +122,16 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+/** Smooth cross-page fade so route changes feel continuous rather than abrupt. */
+function PageTransition({ children }: { children: ReactNode }) {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  return (
+    <div key={pathname} className="animate-in fade-in slide-in-from-bottom-2 duration-500 ease-out">
+      {children}
+    </div>
+  );
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
