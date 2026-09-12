@@ -10,10 +10,10 @@ const links = [
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 border-b border-border bg-navy-deep/80 backdrop-blur-xl">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3.5 lg:px-8">
-        <Link to="/" className="flex items-center gap-2.5">
-          <span className="grid size-8 place-items-center rounded-xl bg-primary font-display text-sm font-bold text-primary-foreground">
+        <Link to="/" className="group flex items-center gap-2.5">
+          <span className="grid size-8 place-items-center rounded-xl bg-accent font-display text-sm font-bold text-primary transition duration-300 group-hover:scale-105">
             N
           </span>
           <span className="font-display text-lg font-bold text-primary">Nivaran</span>
@@ -25,7 +25,7 @@ export function SiteHeader() {
               key={link.to}
               to={link.to}
               activeOptions={{ exact: link.to === "/" }}
-              className="rounded-lg px-3 py-1.5 font-medium whitespace-nowrap text-secondary/80 transition hover:bg-soft hover:text-primary data-[status=active]:bg-soft data-[status=active]:text-primary"
+              className="relative rounded-lg px-3 py-1.5 font-medium whitespace-nowrap text-secondary/80 transition duration-300 hover:bg-soft/60 hover:text-primary data-[status=active]:bg-soft/80 data-[status=active]:text-primary"
             >
               {link.label}
             </Link>
@@ -38,7 +38,7 @@ export function SiteHeader() {
 
 export function SiteFooter() {
   return (
-    <footer className="mt-16 border-t border-border">
+    <footer className="mt-16 border-t border-border bg-navy-deep/60">
       <div className="mx-auto flex max-w-6xl flex-col gap-2 px-5 py-8 text-sm sm:flex-row sm:items-center sm:justify-between lg:px-8">
         <div className="flex items-center gap-2">
           <span className="font-display font-bold text-primary">Nivaran</span>
