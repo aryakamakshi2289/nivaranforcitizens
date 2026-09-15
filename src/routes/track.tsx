@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 
 import { StatusBadge } from "@/components/StatusBadge";
-import { Timeline } from "@/components/Timeline";
 import { Card, EvidenceFrame, MetaGrid, SectionLabel, buttonVariants, inputClass } from "@/components/ui-kit";
 import { CommunityIssuePanel, HistoryDisclosure, RoutingPanel } from "@/components/CivicIntel";
 import { PriorityBadge } from "@/components/PriorityBadge";
