@@ -2,8 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 
 import { StatusBadge } from "@/components/StatusBadge";
-import { Timeline } from "@/components/Timeline";
 import { Card, EvidenceFrame, MetaGrid, SectionLabel, buttonVariants, inputClass } from "@/components/ui-kit";
+import { CommunityIssuePanel, HistoryDisclosure, RoutingPanel } from "@/components/CivicIntel";
+import { PriorityBadge } from "@/components/PriorityBadge";
 import { useNivaran } from "@/lib/nivaran-store";
 
 export const Route = createFileRoute("/track")({
@@ -26,11 +27,12 @@ export const Route = createFileRoute("/track")({
 });
 
 function TrackPage() {
-  const { activeId, setActiveId, getComplaint, complaints } = useNivaran();
+  const { activeId, setActiveId, getComplaint, getCluster, complaints } = useNivaran();
   const [query, setQuery] = useState(activeId);
   const [notFound, setNotFound] = useState(false);
 
   const complaint = getComplaint(activeId);
+  const cluster = getCluster(complaint?.clusterId ?? null);
 
   function handleSearch(event: React.FormEvent) {
     event.preventDefault();
@@ -129,20 +131,38 @@ function TrackPage() {
             <div className="mt-6">
               <MetaGrid
                 items={[
-                  { label: "Category", value: complaint.category },
+                  { label: "Category", value: complaint.analysis.category },
                   { label: "Location", value: complaint.location },
                   { label: "Date Reported", value: complaint.reportedAt },
                 ]}
               />
             </div>
+
+            <div className="mt-6 grid gap-5 sm:grid-cols-2">
+              <RoutingPanel
+                department={complaint.department}
+                reason={`Category: ${complaint.analysis.category}`}
+              />
+              <div className="panel-deep p-4">
+                <SectionLabel>Priority</SectionLabel>
+                <div className="mt-3">
+                  <PriorityBadge
+                    priority={complaint.priority}
+                    factors={complaint.priorityFactors}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {cluster && (
+              <div className="mt-6">
+                <CommunityIssuePanel issue={cluster} />
+              </div>
+            )}
           </Card>
 
           <Card className="p-6 sm:p-8 lg:col-span-2">
-            <SectionLabel>Complaint Timeline</SectionLabel>
-            <p className="mt-1 mb-6 text-sm text-muted-foreground">
-              Append-only. New actions are added; nothing is overwritten.
-            </p>
-            <Timeline events={complaint.events} />
+            <HistoryDisclosure events={complaint.events} defaultOpen />
           </Card>
         </div>
       )}

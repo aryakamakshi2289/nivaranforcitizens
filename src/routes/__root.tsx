@@ -13,6 +13,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
+import { OpeningExperience } from "@/components/OpeningExperience";
 import { NivaranProvider } from "@/lib/nivaran-store";
 
 function NotFoundComponent() {
@@ -139,6 +140,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <NivaranProvider>
+        <OpeningExperience />
         <div className="flex min-h-screen flex-col">
           <SiteHeader />
           <main className="flex-1">
