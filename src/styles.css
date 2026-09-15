@@ -6,8 +6,8 @@
 
 /*
  * Nivaran design system — dark blue civic-tech.
- * Deep navy foundation, slate/sky blue for depth and interaction,
- * off-white used sparingly inside contained elements only.
+ * Deep navy environment, indigo/modern blue interactions,
+ * small off-white surfaces inside contained elements only.
  */
 
 @theme inline {
@@ -36,9 +36,12 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-indigo: var(--indigo);
+  --color-periwinkle: var(--periwinkle);
   --color-soft: var(--soft);
   --color-soft-foreground: var(--soft-foreground);
   --color-field: var(--field);
+  --color-cloud: var(--cloud);
   --color-ink: var(--ink);
   --color-navy: var(--navy);
   --color-navy-deep: var(--navy-deep);
@@ -51,58 +54,72 @@
   --color-verified: var(--verified);
   --color-awaiting: var(--awaiting);
   --color-challenged: var(--challenged);
+  --color-critical: var(--critical);
+  --color-high: var(--high);
+  --color-medium: var(--medium);
+  --color-low: var(--low);
 
-  --shadow-card: 0 1px 0 rgb(246 243 238 / 0.04) inset, 0 18px 40px -24px rgb(4 12 22 / 0.8);
-  --shadow-raised: 0 1px 0 rgb(246 243 238 / 0.06) inset, 0 28px 60px -28px rgb(4 12 22 / 0.9);
+  --shadow-card: 0 1px 0 rgb(244 241 234 / 0.04) inset, 0 18px 40px -24px rgb(4 12 22 / 0.8);
+  --shadow-raised: 0 1px 0 rgb(244 241 234 / 0.06) inset, 0 28px 60px -28px rgb(4 12 22 / 0.9);
 }
 
 :root {
   --radius: 0.875rem;
 
-  /* Dark blue foundation */
-  --background: #0b1f33;
-  --foreground: #eef4f9;
+  /* Dark blue environment */
+  --background: #0d2438;
+  --foreground: #e9eef5;
   --navy: #102a43;
   --navy-deep: #0b1f33;
-  --slate-blue: #274c77;
+  --indigo: #263b73;
+  --slate-blue: #263b73;
+  --periwinkle: #dce7f5;
 
   --card: #102a43;
-  --card-foreground: #eef4f9;
+  --card-foreground: #e9eef5;
   --popover: #102a43;
-  --popover-foreground: #eef4f9;
+  --popover-foreground: #e9eef5;
 
-  /* primary = the off-white used for headings, key text and light CTAs */
-  --primary: #f6f3ee;
+  /* primary = off-white used for headings, key text and light CTAs */
+  --primary: #f4f1ea;
   --primary-foreground: #0b1f33;
 
-  /* secondary = readable light blue-slate body text on dark */
-  --secondary: #b7ccdf;
+  /* secondary = readable light blue body text on dark */
+  --secondary: #c2d1e2;
   --secondary-foreground: #0b1f33;
 
-  --accent: #4b95c9;
+  /* modern blue: buttons, highlights, active states */
+  --accent: #4b86c6;
   --accent-foreground: #071726;
 
   /* soft = subtle raised blue surface for pills, tiles and UI states */
-  --soft: #17395a;
-  --soft-foreground: #eaf2f8;
+  --soft: #17334d;
+  --soft-foreground: #dce7f5;
 
-  --muted: #17395a;
-  --muted-foreground: #93aec6;
+  --muted: #17334d;
+  --muted-foreground: #a9b8c8;
 
   /* contained light elements: inputs, evidence boxes, complaint bubbles */
-  --field: #f6f3ee;
+  --field: #f4f1ea;
+  --cloud: #fbfaf7;
   --ink: #102a43;
 
-  --destructive: #d47a7a;
+  --destructive: #d65c5c;
   --destructive-foreground: #0b1f33;
 
-  --border: rgb(159 194 224 / 0.16);
-  --input: rgb(159 194 224 / 0.26);
-  --ring: #4b95c9;
+  --border: rgb(160 190 220 / 0.16);
+  --input: rgb(160 190 220 / 0.26);
+  --ring: #4b86c6;
 
-  --verified: #62b98f;
-  --awaiting: #e3b45f;
-  --challenged: #dd8383;
+  --verified: #5fb489;
+  --awaiting: #dcae52;
+  --challenged: #e07878;
+
+  /* priority scale */
+  --critical: #e07878;
+  --high: #e09355;
+  --medium: #dcc352;
+  --low: #5fb489;
 }
 
 @layer base {
@@ -150,7 +167,7 @@
 
 @utility card-lift {
   &:hover {
-    border-color: rgb(75 149 201 / 0.45);
+    border-color: rgb(75 134 198 / 0.45);
     box-shadow: var(--shadow-raised);
     transform: translateY(-2px);
   }
@@ -212,15 +229,15 @@
 
 @keyframes niv-pulse-ring {
   0% {
-    box-shadow: 0 0 0 0 currentcolor;
-    opacity: 0.6;
+    transform: scale(0.85);
+    opacity: 0.55;
   }
   70% {
-    box-shadow: 0 0 0 9px transparent;
+    transform: scale(1.9);
     opacity: 0;
   }
   100% {
-    box-shadow: 0 0 0 0 transparent;
+    transform: scale(1.9);
     opacity: 0;
   }
 }
@@ -231,6 +248,35 @@
   }
   to {
     transform: scaleY(1);
+  }
+}
+
+@keyframes niv-mark-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes niv-soft-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes niv-fade-out {
+  to {
+    opacity: 0;
+    transform: scale(1.02);
   }
 }
 
@@ -266,6 +312,33 @@
 @utility timeline-dot {
   animation: niv-rise 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
   animation-delay: var(--tl-delay, 0ms);
+}
+
+/* opening brand sequence */
+@utility intro-mark {
+  animation: niv-mark-in 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@utility intro-step {
+  animation: niv-soft-in 800ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--intro-delay, 0ms);
+}
+
+@utility intro-trail {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  pathlength: 1;
+  animation: niv-draw 1500ms cubic-bezier(0.33, 1, 0.68, 1) both;
+  animation-delay: var(--intro-delay, 0ms);
+}
+
+@utility intro-leave {
+  animation: niv-fade-out 480ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+@utility pulse-ring {
+  animation: niv-pulse-ring 2600ms cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  animation-delay: var(--pulse-delay, 0ms);
 }
 
 @media (prefers-reduced-motion: reduce) {
