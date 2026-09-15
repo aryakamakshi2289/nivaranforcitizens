@@ -33,6 +33,7 @@ function TrackPage() {
   const [notFound, setNotFound] = useState(false);
 
   const complaint = getComplaint(activeId);
+  const cluster = getCluster(complaint?.clusterId ?? null);
 
   function handleSearch(event: React.FormEvent) {
     event.preventDefault();
@@ -131,20 +132,38 @@ function TrackPage() {
             <div className="mt-6">
               <MetaGrid
                 items={[
-                  { label: "Category", value: complaint.category },
+                  { label: "Category", value: complaint.analysis.category },
                   { label: "Location", value: complaint.location },
                   { label: "Date Reported", value: complaint.reportedAt },
                 ]}
               />
             </div>
+
+            <div className="mt-6 grid gap-5 sm:grid-cols-2">
+              <RoutingPanel
+                department={complaint.department}
+                reason={`Category: ${complaint.analysis.category}`}
+              />
+              <div className="panel-deep p-4">
+                <SectionLabel>Priority</SectionLabel>
+                <div className="mt-3">
+                  <PriorityBadge
+                    priority={complaint.priority}
+                    factors={complaint.priorityFactors}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {cluster && (
+              <div className="mt-6">
+                <CommunityIssuePanel issue={cluster} />
+              </div>
+            )}
           </Card>
 
           <Card className="p-6 sm:p-8 lg:col-span-2">
-            <SectionLabel>Complaint Timeline</SectionLabel>
-            <p className="mt-1 mb-6 text-sm text-muted-foreground">
-              Append-only. New actions are added; nothing is overwritten.
-            </p>
-            <Timeline events={complaint.events} />
+            <HistoryDisclosure events={complaint.events} defaultOpen />
           </Card>
         </div>
       )}
