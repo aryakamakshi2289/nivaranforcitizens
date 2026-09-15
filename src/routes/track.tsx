@@ -4,6 +4,8 @@ import { useState } from "react";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Timeline } from "@/components/Timeline";
 import { Card, EvidenceFrame, MetaGrid, SectionLabel, buttonVariants, inputClass } from "@/components/ui-kit";
+import { CommunityIssuePanel, HistoryDisclosure, RoutingPanel } from "@/components/CivicIntel";
+import { PriorityBadge } from "@/components/PriorityBadge";
 import { useNivaran } from "@/lib/nivaran-store";
 
 export const Route = createFileRoute("/track")({
@@ -26,7 +28,7 @@ export const Route = createFileRoute("/track")({
 });
 
 function TrackPage() {
-  const { activeId, setActiveId, getComplaint, complaints } = useNivaran();
+  const { activeId, setActiveId, getComplaint, getCluster, complaints } = useNivaran();
   const [query, setQuery] = useState(activeId);
   const [notFound, setNotFound] = useState(false);
 
