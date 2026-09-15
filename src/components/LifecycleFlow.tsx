@@ -1,6 +1,17 @@
 import { cn } from "@/lib/utils";
 
-const STAGES = ["Report", "Track", "Prove", "Verify", "Resolve / Reopen"] as const;
+const STAGES = [
+  "Report",
+  "Understand",
+  "Detect Duplicates",
+  "Cluster Community Issue",
+  "Prioritize",
+  "Route",
+  "Authority Action",
+  "Submit Proof",
+  "Citizen Verification",
+  "Resolved / Reopened",
+] as const;
 
 /**
  * Flowing lifecycle ribbon: a continuous line with a travelling dash that

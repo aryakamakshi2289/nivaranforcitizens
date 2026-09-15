@@ -1,5 +1,7 @@
 import { Link } from "@tanstack/react-router";
 
+import { NivaranMark } from "@/components/NivaranMark";
+
 const links = [
   { to: "/", label: "Home" },
   { to: "/report", label: "Report" },
@@ -13,9 +15,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 border-b border-border bg-navy-deep/80 backdrop-blur-xl">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3.5 lg:px-8">
         <Link to="/" className="group flex items-center gap-2.5">
-          <span className="grid size-8 place-items-center rounded-xl bg-accent font-display text-sm font-bold text-primary transition duration-300 group-hover:scale-105">
-            N
-          </span>
+          <NivaranMark className="size-8 transition duration-300 group-hover:scale-105" />
           <span className="font-display text-lg font-bold text-primary">Nivaran</span>
         </Link>
 
