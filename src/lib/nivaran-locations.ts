@@ -1,90 +1,56 @@
-/** Mock location data for the prototype — no live GPS or map service is used. */
+import { Country, State, type ICountry, type IState } from "country-state-city";
 
-export type CityEntry = {
-  city: string;
-  state: string;
-  areas: string[];
+export type CountryOption = Pick<ICountry, "isoCode" | "name" | "flag">;
+export type RegionOption = Pick<IState, "isoCode" | "name" | "countryCode">;
+
+export const COUNTRIES: CountryOption[] = Country.getAllCountries()
+  .map(({ isoCode, name, flag }) => ({ isoCode, name, flag }))
+  .sort((a, b) => a.name.localeCompare(b.name));
+
+export function regionsForCountry(countryCode: string): RegionOption[] {
+  return State.getStatesOfCountry(countryCode)
+    .map(({ isoCode, name, countryCode: regionCountryCode }) => ({
+      isoCode,
+      name,
+      countryCode: regionCountryCode,
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+const REGION_LABELS: Record<string, string> = {
+  AU: "State / Territory",
+  BR: "State",
+  CA: "Province / Territory",
+  CN: "Province / Region",
+  DE: "State",
+  ES: "Autonomous Community",
+  FR: "Region",
+  GB: "Region / Constituent Country",
+  IN: "State / Union Territory",
+  IT: "Region",
+  JP: "Prefecture",
+  MX: "State",
+  NZ: "Region",
+  US: "State / Territory",
+  ZA: "Province",
 };
 
-export const CITIES: CityEntry[] = [
-  {
-    city: "Delhi",
-    state: "Delhi",
-    areas: ["Karol Bagh", "Dwarka Sector 12", "Rohini Sector 7", "Lajpat Nagar"],
-  },
-  {
-    city: "Noida",
-    state: "Uttar Pradesh",
-    areas: ["Sector 15", "Sector 18", "Sector 12", "Sector 62"],
-  },
-  {
-    city: "Greater Noida",
-    state: "Uttar Pradesh",
-    areas: ["Alpha 1", "Beta 2", "Knowledge Park III"],
-  },
-  {
-    city: "Ghaziabad",
-    state: "Uttar Pradesh",
-    areas: ["Indirapuram", "Vaishali", "Raj Nagar Extension"],
-  },
-  {
-    city: "Gurugram",
-    state: "Haryana",
-    areas: ["Sector 29", "DLF Phase 3", "Sohna Road"],
-  },
-  {
-    city: "Lucknow",
-    state: "Uttar Pradesh",
-    areas: ["Gomti Nagar", "Hazratganj", "Alambagh"],
-  },
-  {
-    city: "Mumbai",
-    state: "Maharashtra",
-    areas: ["Andheri West", "Dadar", "Borivali East"],
-  },
-  {
-    city: "Bengaluru",
-    state: "Karnataka",
-    areas: ["Koramangala", "Indiranagar", "Whitefield"],
-  },
-  {
-    city: "Hyderabad",
-    state: "Telangana",
-    areas: ["Gachibowli", "Kukatpally", "Begumpet"],
-  },
-  {
-    city: "Jaipur",
-    state: "Rajasthan",
-    areas: ["Malviya Nagar", "Vaishali Nagar", "C-Scheme"],
-  },
-  {
-    city: "Kolkata",
-    state: "West Bengal",
-    areas: ["Salt Lake Sector 2", "Behala", "Ballygunge"],
-  },
-  {
-    city: "Chennai",
-    state: "Tamil Nadu",
-    areas: ["T. Nagar", "Velachery", "Anna Nagar"],
-  },
-];
-
-export const STATES = Array.from(new Set(CITIES.map((c) => c.state))).sort();
-
-/** Simulated "current location" result used by the prototype only. */
-export const SIMULATED_CURRENT_LOCATION = {
-  area: "Sector 15",
-  city: "Noida",
-  state: "Uttar Pradesh",
-  landmark: "near the bus stop",
-};
+export function regionLabel(countryCode: string) {
+  return REGION_LABELS[countryCode] ?? "State / Province / Region";
+}
 
 export function formatLocation(parts: {
-  area: string;
-  city: string;
-  state: string;
+  address: string;
   landmark?: string;
+  region: string;
+  country: string;
 }) {
-  const base = [parts.area, parts.city, parts.state].filter(Boolean).join(", ");
-  return parts.landmark ? `${base} (${parts.landmark})` : base;
+  return [
+    parts.address.trim(),
+    parts.landmark.trim() ? `Landmark: ${parts.landmark.trim()}` : "",
+    parts.region,
+    parts.country,
+  ]
+    .filter(Boolean)
+    .join(", ");
 }

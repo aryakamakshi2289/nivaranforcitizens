@@ -1,18 +1,159 @@
-import { useMemo, useState } from "react";
+import { Check, ChevronDown, Globe2, MapPin, Search } from "lucide-react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 import { inputClass } from "@/components/ui-kit";
+import {
+  COUNTRIES,
+  regionLabel,
+  regionsForCountry,
+  type CountryOption,
+  type RegionOption,
+} from "@/lib/nivaran-locations";
 import { cn } from "@/lib/utils";
-import { CITIES, SIMULATED_CURRENT_LOCATION, STATES } from "@/lib/nivaran-locations";
 
 export type LocationValue = {
-  state: string;
-  city: string;
-  area: string;
+  countryCode: string;
+  country: string;
+  regionCode: string;
+  region: string;
+  address: string;
   landmark: string;
 };
 
-const PIN_COLUMNS = ["A", "B", "C", "D", "E"];
-const PIN_ROWS = [1, 2, 3, 4];
+type SearchSelectProps<T> = {
+  id: string;
+  label: string;
+  icon: ReactNode;
+  options: T[];
+  value: string;
+  getKey: (option: T) => string;
+  getLabel: (option: T) => string;
+  getPrefix?: (option: T) => ReactNode;
+  placeholder: string;
+  searchPlaceholder: string;
+  emptyMessage: string;
+  onSelect: (option: T) => void;
+};
+
+function SearchSelect<T>({
+  id,
+  label,
+  icon,
+  options,
+  value,
+  getKey,
+  getLabel,
+  getPrefix,
+  placeholder,
+  searchPlaceholder,
+  emptyMessage,
+  onSelect,
+}: SearchSelectProps<T>) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const rootRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
+
+  const matches = useMemo(() => {
+    const normalized = query.trim().toLocaleLowerCase();
+    if (!normalized) return options;
+    return options.filter((option) => getLabel(option).toLocaleLowerCase().includes(normalized));
+  }, [getLabel, options, query]);
+
+  useEffect(() => {
+    function closeOutside(event: PointerEvent) {
+      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
+    }
+    document.addEventListener("pointerdown", closeOutside);
+    return () => document.removeEventListener("pointerdown", closeOutside);
+  }, []);
+
+  useEffect(() => {
+    if (open) requestAnimationFrame(() => searchRef.current?.focus());
+  }, [open]);
+
+  return (
+    <div ref={rootRef} className="relative">
+      <label id={`${id}-label`} className="flex items-center gap-2 text-sm font-semibold text-primary">
+        <span className="text-accent" aria-hidden="true">{icon}</span>
+        {label}
+      </label>
+      <button
+        id={id}
+        type="button"
+        aria-labelledby={`${id}-label ${id}`}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        onClick={() => {
+          setOpen((current) => !current);
+          setQuery("");
+        }}
+        className={cn(inputClass, "mt-2 flex min-h-11 items-center justify-between gap-3 text-left")}
+      >
+        <span className={value ? "text-ink" : "text-slate-blue/55"}>{value || placeholder}</span>
+        <ChevronDown
+          className={cn("size-4 shrink-0 text-slate-blue transition-transform duration-300", open && "rotate-180")}
+          aria-hidden="true"
+        />
+      </button>
+
+      {open && (
+        <div className="animate-in fade-in slide-in-from-top-1 absolute z-30 mt-2 w-full overflow-hidden rounded-xl border border-border bg-navy-deep shadow-raised duration-200">
+          <div className="relative border-b border-border p-2.5">
+            <Search className="absolute left-5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+            <input
+              ref={searchRef}
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Escape") setOpen(false);
+                if (event.key === "Enter" && matches[0]) {
+                  event.preventDefault();
+                  onSelect(matches[0]);
+                  setOpen(false);
+                }
+              }}
+              className="w-full rounded-lg bg-soft py-2 pl-9 pr-3 text-sm text-primary outline-none ring-1 ring-inset ring-border placeholder:text-muted-foreground focus:ring-accent"
+              placeholder={searchPlaceholder}
+              aria-label={searchPlaceholder}
+              aria-controls={`${id}-options`}
+            />
+          </div>
+          <ul id={`${id}-options`} role="listbox" className="max-h-60 overflow-y-auto p-1.5">
+            {matches.length ? (
+              matches.map((option) => {
+                const optionLabel = getLabel(option);
+                const selected = optionLabel === value;
+                return (
+                  <li key={getKey(option)} role="option" aria-selected={selected}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onSelect(option);
+                        setOpen(false);
+                        setQuery("");
+                      }}
+                      className={cn(
+                        "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-secondary transition-colors duration-200 hover:bg-soft hover:text-primary",
+                        selected && "bg-soft text-primary",
+                      )}
+                    >
+                      {getPrefix?.(option)}
+                      <span className="min-w-0 flex-1 truncate">{optionLabel}</span>
+                      {selected && <Check className="size-4 text-accent" aria-hidden="true" />}
+                    </button>
+                  </li>
+                );
+              })
+            ) : (
+              <li className="px-3 py-6 text-center text-sm text-muted-foreground">{emptyMessage}</li>
+            )}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function LocationPicker({
   value,
@@ -21,201 +162,111 @@ export function LocationPicker({
   value: LocationValue;
   onChange: (next: LocationValue) => void;
 }) {
-  const [search, setSearch] = useState("");
-  const [pin, setPin] = useState<string | null>(null);
-
-  const citiesInState = useMemo(
-    () => CITIES.filter((c) => c.state === value.state),
-    [value.state],
-  );
-
-  const areas = useMemo(
-    () => CITIES.find((c) => c.city === value.city)?.areas ?? [],
-    [value.city],
-  );
-
-  const matches = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    if (q.length < 2) return [];
-    const out: { area: string; city: string; state: string }[] = [];
-    for (const entry of CITIES) {
-      if (entry.city.toLowerCase().includes(q) || entry.state.toLowerCase().includes(q)) {
-        for (const area of entry.areas) out.push({ area, city: entry.city, state: entry.state });
-      } else {
-        for (const area of entry.areas) {
-          if (area.toLowerCase().includes(q)) out.push({ area, city: entry.city, state: entry.state });
-        }
-      }
-    }
-    return out.slice(0, 6);
-  }, [search]);
+  const regions = useMemo(() => regionsForCountry(value.countryCode), [value.countryCode]);
+  const administrativeLabel = regionLabel(value.countryCode);
 
   function pick(next: Partial<LocationValue>) {
     onChange({ ...value, ...next });
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5 rounded-xl bg-navy-deep/55 p-4 ring-1 ring-inset ring-border sm:p-5">
       <div>
-        <input
-          className={inputClass}
-          placeholder="Search an area, locality, city or state — e.g. Sector 15, Noida"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          aria-label="Search location"
+        <h2 className="font-display text-lg font-bold text-primary">Where is the issue?</h2>
+        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+          Choose the country and administrative region, then enter the complete address.
+        </p>
+      </div>
+
+      <SearchSelect<CountryOption>
+        id="location-country"
+        label="Country"
+        icon={<Globe2 className="size-4" />}
+        options={COUNTRIES}
+        value={value.country}
+        getKey={(country) => country.isoCode}
+        getLabel={(country) => country.name}
+        getPrefix={(country) => <span className="text-base" aria-hidden="true">{country.flag}</span>}
+        placeholder="Select country"
+        searchPlaceholder="Search countries..."
+        emptyMessage="No country matches your search."
+        onSelect={(country) => {
+          const countryRegions = regionsForCountry(country.isoCode);
+          pick({
+            countryCode: country.isoCode,
+            country: country.name,
+            regionCode: "",
+            region: "",
+          });
+          if (countryRegions.length === 1) {
+            const onlyRegion = countryRegions[0];
+            if (onlyRegion) pick({
+              countryCode: country.isoCode,
+              country: country.name,
+              regionCode: onlyRegion.isoCode,
+              region: onlyRegion.name,
+            });
+          }
+        }}
+      />
+
+      {regions.length > 0 ? (
+        <SearchSelect<RegionOption>
+          id="location-region"
+          label={administrativeLabel}
+          icon={<MapPin className="size-4" />}
+          options={regions}
+          value={value.region}
+          getKey={(region) => `${region.countryCode}-${region.isoCode}`}
+          getLabel={(region) => region.name}
+          placeholder={`Select ${administrativeLabel.toLowerCase()}`}
+          searchPlaceholder={`Search ${administrativeLabel.toLowerCase()}...`}
+          emptyMessage={`No ${administrativeLabel.toLowerCase()} matches your search.`}
+          onSelect={(region) => pick({ regionCode: region.isoCode, region: region.name })}
         />
-        {matches.length > 0 && (
-          <ul className="animate-in fade-in mt-2 divide-y divide-border overflow-hidden rounded-xl bg-navy-deep/80 ring-1 ring-inset ring-border duration-300">
-            {matches.map((m) => (
-              <li key={`${m.area}-${m.city}`}>
-                <button
-                  type="button"
-                  className="flex w-full items-center justify-between gap-3 px-3.5 py-2.5 text-left text-sm transition hover:bg-soft/60"
-                  onClick={() => {
-                    pick({ area: m.area, city: m.city, state: m.state });
-                    setSearch("");
-                  }}
-                >
-                  <span className="font-medium text-primary">{m.area}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {m.city}, {m.state}
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      <div className="grid gap-3 sm:grid-cols-2">
+      ) : (
         <label className="block">
-          <span className="label-caps">State</span>
-          <select
-            className={cn(inputClass, "mt-1.5")}
-            value={value.state}
-            onChange={(e) => {
-              const state = e.target.value;
-              const firstCity = CITIES.find((c) => c.state === state);
-              pick({
-                state,
-                city: firstCity?.city ?? "",
-                area: firstCity?.areas[0] ?? "",
-              });
-            }}
-          >
-            {STATES.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </select>
+          <span className="flex items-center gap-2 text-sm font-semibold text-primary">
+            <MapPin className="size-4 text-accent" aria-hidden="true" />
+            {administrativeLabel}
+          </span>
+          <input
+            required
+            className={cn(inputClass, "mt-2")}
+            placeholder={`Enter ${administrativeLabel.toLowerCase()}`}
+            value={value.region}
+            onChange={(event) => pick({ region: event.target.value, regionCode: "" })}
+          />
         </label>
-
-        <label className="block">
-          <span className="label-caps">City</span>
-          <select
-            className={cn(inputClass, "mt-1.5")}
-            value={value.city}
-            onChange={(e) => {
-              const city = e.target.value;
-              const entry = CITIES.find((c) => c.city === city);
-              pick({ city, area: entry?.areas[0] ?? "" });
-            }}
-          >
-            {citiesInState.map((c) => (
-              <option key={c.city} value={c.city}>
-                {c.city}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
-
-      <div>
-        <span className="label-caps">Neighbourhood / Area</span>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {areas.map((area) => (
-            <button
-              key={area}
-              type="button"
-              onClick={() => pick({ area })}
-              className={cn(
-                "rounded-full px-3 py-1.5 text-xs font-medium transition duration-300",
-                area === value.area
-                  ? "bg-accent text-primary"
-                  : "bg-soft/70 text-secondary ring-1 ring-inset ring-border hover:text-primary",
-              )}
-            >
-              {area}
-            </button>
-          ))}
-        </div>
-      </div>
+      )}
 
       <label className="block">
-        <span className="label-caps">Landmark (optional)</span>
-        <input
-          className={cn(inputClass, "mt-1.5")}
-          placeholder="near the bus stop"
-          value={value.landmark}
-          onChange={(e) => pick({ landmark: e.target.value })}
+        <span className="flex items-center gap-2 text-sm font-semibold text-primary">
+          <span className="text-accent" aria-hidden="true">⌂</span>
+          Address
+        </span>
+        <textarea
+          required
+          rows={3}
+          className={cn(inputClass, "mt-2 resize-y")}
+          placeholder="House or building, street, locality, city and postal code"
+          value={value.address}
+          onChange={(event) => pick({ address: event.target.value })}
         />
+        <span className="mt-1.5 block text-xs text-muted-foreground">
+          Enter the complete address in the format used locally.
+        </span>
       </label>
 
-      <div className="flex flex-wrap gap-2">
-        <button
-          type="button"
-          onClick={() => {
-            pick({
-              state: SIMULATED_CURRENT_LOCATION.state,
-              city: SIMULATED_CURRENT_LOCATION.city,
-              area: SIMULATED_CURRENT_LOCATION.area,
-              landmark: SIMULATED_CURRENT_LOCATION.landmark,
-            });
-            setSearch("");
-          }}
-          className="rounded-xl border border-input px-3.5 py-2 text-sm font-semibold text-primary transition duration-300 hover:border-accent/60 hover:bg-soft/60"
-        >
-          Use current location
-        </button>
-        <span className="self-center text-xs text-muted-foreground">
-          Demo only — returns a sample location, no live GPS is used.
-        </span>
-      </div>
-
-      <div className="rounded-xl bg-navy-deep/70 p-4 ring-1 ring-inset ring-border">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <span className="label-caps">Drop a pin</span>
-          <span className="text-xs text-muted-foreground">Sketch grid, not a live map</span>
-        </div>
-        <div className="mt-3 grid grid-cols-5 gap-1.5">
-          {PIN_ROWS.map((row) =>
-            PIN_COLUMNS.map((col) => {
-              const cell = `${col}${row}`;
-              const active = pin === cell;
-              return (
-                <button
-                  key={cell}
-                  type="button"
-                  aria-label={`Pin grid ${cell}`}
-                  onClick={() => {
-                    setPin(cell);
-                    pick({ landmark: `pinned at grid ${cell}` });
-                  }}
-                  className={cn(
-                    "grid aspect-square place-items-center rounded-md text-[10px] font-medium transition duration-300",
-                    active
-                      ? "bg-accent text-primary"
-                      : "bg-soft/50 text-muted-foreground hover:bg-soft",
-                  )}
-                >
-                  {cell}
-                </button>
-              );
-            }),
-          )}
-        </div>
-      </div>
+      <label className="block">
+        <span className="text-sm font-semibold text-primary">Landmark (optional)</span>
+        <input
+          className={cn(inputClass, "mt-2")}
+          placeholder="e.g. Near City Mall, opposite Metro Station"
+          value={value.landmark}
+          onChange={(event) => pick({ landmark: event.target.value })}
+        />
+      </label>
     </div>
   );
 }

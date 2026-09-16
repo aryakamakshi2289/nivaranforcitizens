@@ -34,10 +34,12 @@ function ReportPage() {
   const [category, setCategory] = useState<string>(CATEGORIES[0]);
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState<LocationValue>({
-    state: "Uttar Pradesh",
-    city: "Noida",
-    area: "Sector 15",
-    landmark: "near the bus stop",
+    countryCode: "IN",
+    country: "India",
+    regionCode: "UP",
+    region: "Uttar Pradesh",
+    address: "",
+    landmark: "",
   });
   const [image, setImage] = useState<string | null>(null);
   const [fileName, setFileName] = useState("");
@@ -49,8 +51,8 @@ function ReportPage() {
       category,
       description,
       location: formatLocation(location),
-      area: location.area,
-      city: location.city,
+      area: location.address,
+      city: location.region,
       image,
     });
     setSubmittedId(id);
@@ -170,14 +172,18 @@ function ReportPage() {
 
           <Field
             label="Location"
-            hint="Search, choose a city and area, use your current location or drop a pin. Demo location data."
+            hint="Choose any country and its administrative region, then enter the complete address."
           >
             <LocationPicker value={location} onChange={setLocation} />
           </Field>
 
           <div className="rounded-xl bg-soft/50 px-4 py-3 ring-1 ring-inset ring-border">
             <span className="label-caps">Selected location</span>
-            <p className="mt-0.5 text-sm font-medium text-primary">{formatLocation(location)}</p>
+            <p className="mt-0.5 text-sm font-medium text-primary">
+              {location.address.trim()
+                ? formatLocation(location)
+                : `${location.region || "Select a region"}, ${location.country}`}
+            </p>
           </div>
 
           <Field label="Evidence" hint="Take a photo now or upload one from your device.">
