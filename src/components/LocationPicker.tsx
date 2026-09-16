@@ -128,10 +128,11 @@ function SearchSelect<T>({
                   <li key={getKey(option)} role="option" aria-selected={selected}>
                     <button
                       type="button"
-                      onClick={() => {
-                        onSelect(option);
+                      onPointerDown={(event) => {
+                        event.preventDefault();
                         setOpen(false);
                         setQuery("");
+                        onSelect(option);
                       }}
                       className={cn(
                         "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-secondary transition-colors duration-200 hover:bg-soft hover:text-primary",
@@ -186,7 +187,11 @@ export function LocationPicker({
         value={value.country}
         getKey={(country) => country.isoCode}
         getLabel={(country) => country.name}
-        getPrefix={(country) => <span className="text-base" aria-hidden="true">{country.flag}</span>}
+        getPrefix={(country) => (
+          <span className="w-7 shrink-0 font-mono text-[10px] font-semibold text-accent" aria-hidden="true">
+            {country.isoCode}
+          </span>
+        )}
         placeholder="Select country"
         searchPlaceholder="Search countries..."
         emptyMessage="No country matches your search."
