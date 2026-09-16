@@ -45,9 +45,10 @@ export function formatLocation(parts: {
   region: string;
   country: string;
 }) {
+  const landmark = parts.landmark?.trim() ?? "";
   return [
     parts.address.trim(),
-    parts.landmark.trim() ? `Landmark: ${parts.landmark.trim()}` : "",
+    landmark ? `Landmark: ${landmark}` : "",
     parts.region,
     parts.country,
   ]
